@@ -3,12 +3,34 @@
  */
 package spacetravel;
 
-public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
+import spacetravel.client.Client;
+import spacetravel.client.ClientCrudService;
+import spacetravel.database_flyway_service.DatabaseFlyWayService;
+import spacetravel.exception.NullOutputException;
+import spacetravel.planet.Planet;
+import spacetravel.planet.PlanetCrudService;
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+import java.io.IOException;
+
+public class App {
+
+    public static void main(String[] args) throws IOException, NullOutputException {
+
+        new DatabaseFlyWayService().initFlyWayDB();
+
+        ClientCrudService clientCrudService = new ClientCrudService();
+
+        Client client = new Client();
+        client.setName("Tonks");
+        clientCrudService.createNewClient(client);
+        clientCrudService.deleteClient(client);
+
+        PlanetCrudService planetCrudService = new PlanetCrudService();
+        Planet planet = new Planet();
+        planet.setId("SAT");
+        planet.setName("Saturn");
+        planetCrudService.createNewPlanet(planet);
+        planetCrudService.deletePlanet(planet);
+
     }
 }
