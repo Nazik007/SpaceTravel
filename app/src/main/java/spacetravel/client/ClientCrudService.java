@@ -2,8 +2,11 @@ package spacetravel.client;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import spacetravel.exception.NullOutputException;
 import spacetravel.hibernate_util.HibernateUtil;
+
+import java.util.List;
 
 public class ClientCrudService implements ClientService {
 
@@ -38,5 +41,52 @@ public class ClientCrudService implements ClientService {
                 System.out.println("The client with name " + client.getName() + " was deleted.");
             }
         }
+    }
+
+    @Override
+    public void getClientById(int id) throws NullOutputException {
+        try (Session session = util.getSessionFactory().openSession()) {
+            Client clientFromDB = session.get(Client.class, id);
+            if (clientFromDB == null) {
+                throw new NullOutputException("The client with id " + id + " does not exists.");
+            }else {
+                System.out.println(clientFromDB);
+            }
+        }
+    }
+
+    @Override
+    public void updateClient(Client client) throws NullOutputException {
+        if (client.getName().length() <= 3) {
+            System.out.println("A client's name can't be updated due to the restrictions," +
+                    " the name must consist of at least 3 characters.");
+        } else {
+            try (Session session = util.getSessionFactory().openSession()) {
+                Transaction transaction = session.beginTransaction();
+                client = session.get(Client.class, client.getId());
+                if (client == null) {
+                    throw new NullOutputException("The client " + client + " does not exist.");
+                } else {
+                    client.setName(client.getName());
+                    session.persist(client);
+                    transaction.commit();
+                    System.out.println("The client's name with id " + client.getId() + " was updated to " + client.getName() +
+                            ".\n" + client);
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<Client> getAllClients() {
+        List<Client> clients;
+        try  (Session session = util.getSessionFactory().openSession()){
+            Query<Client> clientQuery = session.createQuery(
+                    "from Client",
+                    Client.class
+            );
+            clients = clientQuery.list();
+        }
+        return clients;
     }
 }

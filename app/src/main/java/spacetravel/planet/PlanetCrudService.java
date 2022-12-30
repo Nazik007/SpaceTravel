@@ -2,8 +2,11 @@ package spacetravel.planet;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import spacetravel.exception.NullOutputException;
 import spacetravel.hibernate_util.HibernateUtil;
+
+import java.util.List;
 
 public class PlanetCrudService implements PlanetService{
 
@@ -48,5 +51,47 @@ public class PlanetCrudService implements PlanetService{
             }
         }
     }
+
+    @Override
+    public void getPlanetById(String id) throws NullOutputException {
+        try (Session session = util.getSessionFactory().openSession()) {
+            Planet planet = session.get(Planet.class, id);
+            if (planet == null) {
+                throw new NullOutputException("The planet with id " + id + " does not exists.");
+            }else {
+                System.out.println(planet);
+            }
+        }
     }
+
+    @Override
+    public void updatePlanet(String id, Planet planet) throws NullOutputException {
+        try (Session session = util.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+            planet = session.get(Planet.class, id);
+            if (planet == null) {
+                throw new NullOutputException("The planet with id " + id + " was not found.");
+            }else {
+                planet.setName(planet.getName());
+                session.persist(planet);
+                transaction.commit();
+                System.out.println("The planet's name with id " + id + " was updated to " + planet.getName() +
+                        ".\n" + planet);
+            }
+        }
+    }
+
+    @Override
+    public List<Planet> getAllPlanets() {
+        List<Planet> planets;
+        try (Session session = util.getSessionFactory().openSession()) {
+            Query<Planet> planetQuery = session.createQuery(
+                    "from Planet",
+                    Planet.class
+            );
+            planets = planetQuery.list();
+        }
+        return planets;
+    }
+}
 
