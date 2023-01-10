@@ -9,6 +9,7 @@ import spacetravel.database_flyway_service.DatabaseFlyWayService;
 import spacetravel.exception.NullOutputException;
 import spacetravel.planet.Planet;
 import spacetravel.planet.PlanetCrudService;
+import spacetravel.ticket.TicketCrudService;
 
 import java.io.IOException;
 
@@ -31,6 +32,7 @@ public class App {
         planet.setName("Saturn");
         planetCrudService.createNewPlanet(planet);
         planetCrudService.deletePlanet(planet);
+
 
     }
 }
